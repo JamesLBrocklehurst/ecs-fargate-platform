@@ -46,7 +46,7 @@ curl http://localhost:8080/health
 You should see the following response:
 
 ```json
-{"status":"ok"}
+{"status":"UP"}
 ```
 
 ![Health check](images/healthcheck-nodocker.png)
