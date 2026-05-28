@@ -58,3 +58,60 @@ The application is configured via `gatus/config.yaml`. Edit this file to add or 
 **Stopping the application**
 
 Press `Ctrl + C` in the terminal where the application is running.
+
+---
+
+### In Docker
+
+**Prerequisites**
+
+- [Docker](https://docs.docker.com/get-docker/) installed and running
+
+**Build the image**
+
+Run this from the repo root:
+
+```bash
+docker build -f docker/gatus/dockerfile -t gatus:local ./gatus
+```
+
+**Run the application**
+
+```bash
+docker run -d -p 8080:8080 --name gatus gatus:local
+```
+
+The application will be available at `http://localhost:8080`.
+
+**Verify the application is running**
+
+Once the container has started, confirm it is healthy by running the following command:
+
+```bash
+curl http://localhost:8080/health
+```
+
+You should see the following response:
+
+```json
+{"status":"UP"}
+```
+
+To check the container is running and view recent logs:
+
+```bash
+docker ps --filter name=gatus
+docker logs gatus
+```
+
+**Stopping the application**
+
+```bash
+docker stop gatus
+```
+
+To start it again without rebuilding:
+
+```bash
+docker start gatus
+```
