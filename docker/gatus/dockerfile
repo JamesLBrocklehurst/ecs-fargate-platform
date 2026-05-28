@@ -1,1 +1,57 @@
-# Gatus Docker file
+# Gatus Dockerfile
+
+# --- Build stage ---
+# Use the official Go Alpine image as the builder. Alpine keeps the image small.
+# We name this stage "builder" so the final stage can copy from it.
+FROM golang:alpine AS builder
+
+# Install CA certificates here in the builder so we can copy them into the
+# final scratch image. Without these, HTTPS health check requests will fail.
+RUN apk --update add ca-certificates
+
+WORKDIR /gatus
+
+# Copy all source files into the build context
+COPY . ./
+
+# Tidy the go.mod/go.sum to ensure dependencies are consistent before building
+RUN go mod tidy
+
+# Build a fully static binary:
+#   CGO_ENABLED=0  — disables C bindings so the binary has no libc dependency
+#   GOOS=linux     — targets Linux regardless of the host OS
+#   -a             — forces a rebuild of all packages (avoids stale cache issues)
+#   -installsuffix cgo — keeps CGO and non-CGO build artifacts separate
+# -ldflags="-s -w" strips the debug symbol table (-s) and DWARF debug info (-w)
+# from the binary — safe for production, typically cuts 20-30% off binary size
+RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -ldflags="-s -w" -o gatus .
+
+# --- Final stage ---
+# scratch is an empty base image with no OS, shell, or utilities.
+# This minimises the image size and removes any potential OS-level attack surface.
+FROM scratch
+
+# Copy only the compiled binary from the builder — nothing else from the build environment
+COPY --from=builder /gatus/gatus .
+
+# Bake the config into the image at build time so the container is self-contained
+COPY --from=builder /gatus/config.yaml ./config/config.yaml
+
+# Copy the CA certs fetched in the builder stage. Required for HTTPS health checks.
+COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
+
+# Tell Gatus where to find the config file at runtime
+ENV GATUS_CONFIG_PATH="/config/config.yaml"
+
+# Log level can be overridden at runtime via ECS task definition environment variables
+ENV GATUS_LOG_LEVEL="INFO"
+
+# Port Gatus listens on — can be overridden at runtime
+ENV PORT="8080"
+
+# Documents which port the container listens on (informational, does not publish the port)
+EXPOSE ${PORT}
+
+# Set the binary as the fixed entrypoint. Using ENTRYPOINT rather than CMD prevents
+# the binary from being accidentally replaced when passing arguments to docker run.
+ENTRYPOINT ["/gatus"]
