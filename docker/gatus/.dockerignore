@@ -1,0 +1,30 @@
+# Git
+.git
+.git 2
+.gitignore
+.gitattributes
+.github
+
+# Documentation
+README.md
+AGENTS.md
+LICENSE
+docs/
+.examples
+.examples 2
+
+# IDE
+.idea
+
+# Build artefacts
+*.db
+
+# Test data
+testdata/
+test/
+
+# Frontend source (pre-built assets not needed for Go build)
+web/app
+
+# Upstream Dockerfile (we use our own in docker/gatus/)
+Dockerfile
