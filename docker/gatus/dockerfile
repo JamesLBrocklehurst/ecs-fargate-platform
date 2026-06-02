@@ -1,30 +1,24 @@
 # Gatus Dockerfile
 
 # --- Build stage ---
-# Use the official Go Alpine image as the builder. Alpine keeps the image small.
-# We name this stage "builder" so the final stage can copy from it.
+# Use the official Go Alpine image as the build environment.
+# Alpine is chosen to keep the image small while still providing the tools needed (apk, shell).
+# We name this stage "builder" so the final stage can selectively copy from it.
 FROM golang:alpine AS builder
 
-# Install CA certificates in the builder. Although distroless includes its own certs,
-# this ensures they are present and up to date during the build process.
+# Install CA certificates in the builder stage.
+# These are needed at build time so `go install` can make HTTPS connections to download the module.
 RUN apk --update add ca-certificates
 
-WORKDIR /gatus
-
-# Copy all source files into the build context
-COPY . ./
-
-# Tidy the go.mod/go.sum to ensure dependencies are consistent before building
-RUN go mod tidy
-
-# Build a fully static binary:
-#   CGO_ENABLED=0  — disables C bindings so the binary has no libc dependency
-#   GOOS=linux     — targets Linux regardless of the host OS
-#   -a             — forces a rebuild of all packages (avoids stale cache issues)
-#   -installsuffix cgo — keeps CGO and non-CGO build artifacts separate
-# -ldflags="-s -w" strips the debug symbol table (-s) and DWARF debug info (-w)
-# from the binary — safe for production, typically cuts 20-30% off binary size
-RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -ldflags="-s -w" -o gatus .
+# Download and install the pinned Gatus release directly from its upstream module path.
+# This replaces the previous approach of copying a local source tree and running `go build`.
+#   CGO_ENABLED=0  — disables C bindings so the resulting binary has no libc dependency (fully static)
+#   GOOS=linux     — cross-compiles for Linux regardless of the host OS (e.g. macOS)
+#   go install     — downloads, builds, and installs the binary to $GOPATH/bin
+#   @v5.36.0       — pins to an exact release tag for reproducible builds
+#   -ldflags="-s -w" strips the debug symbol table (-s) and DWARF debug info (-w)
+#                    from the binary — safe for production, typically cuts 20-30% off binary size
+RUN CGO_ENABLED=0 GOOS=linux go install -ldflags="-s -w" github.com/TwiN/gatus/v5@v5.36.0
 
 # --- Final stage ---
 # distroless/static:nonroot has no shell or package manager (minimal attack surface),
@@ -34,22 +28,30 @@ FROM gcr.io/distroless/static:nonroot
 
 WORKDIR /gatus
 
-# Copy only the compiled binary from the builder — nothing else from the build environment
-COPY --from=builder /gatus/gatus .
+# Copy only the compiled Gatus binary from the builder stage — nothing else from the build environment.
+# The official golang:alpine image sets GOPATH=/go, so `go install` places the binary at /go/bin/gatus.
+COPY --from=builder /go/bin/gatus .
 
-# Bake the config into the image at build time so the container is self-contained
-COPY --from=builder /gatus/config.yaml ./config/config.yaml
+# Copy the CA certificates from the builder so Gatus can make HTTPS requests at runtime
+# (distroless/static:nonroot includes its own certs, but this keeps things explicit and consistent)
+COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
 
-# Tell Gatus where to find the config file at runtime
-ENV GATUS_CONFIG_PATH="/config/config.yaml"
+# Copy the monitoring config file from the repo's config/ directory into the image.
+# This bakes the config in at build time so the container is self-contained.
+# For ECS deployments, this can be overridden by mounting a volume or using SSM/S3 at runtime.
+COPY config/config.yaml ./config/config.yaml
 
-# Log level can be overridden at runtime via ECS task definition environment variables
+# Tell Gatus where to find the config file at runtime.
+# This path must match where we copied config.yaml above.
+ENV GATUS_CONFIG_PATH="/gatus/config/config.yaml"
+
+# Log level can be overridden at runtime via ECS task definition environment variables.
 ENV GATUS_LOG_LEVEL="INFO"
 
-# Port Gatus listens on — can be overridden at runtime
+# Port Gatus listens on — can be overridden at runtime.
 ENV PORT="8080"
 
-# Documents which port the container listens on (informational, does not publish the port)
+# Documents which port the container listens on (informational only — does not publish the port).
 EXPOSE ${PORT}
 
 # Set the binary as the fixed entrypoint. Using ENTRYPOINT rather than CMD prevents

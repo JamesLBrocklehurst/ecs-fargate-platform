@@ -115,3 +115,86 @@ To start it again without rebuilding:
 ```bash
 docker start gatus
 ```
+
+---
+
+## Changes
+
+### Removing the Gatus sub-repo in favour of `go install`
+
+**What is changing**
+
+The `gatus/` directory was previously a Git submodule containing the full Gatus source tree. The `Dockerfile` built the binary by copying that source into the image and running `go build` against it locally. This is being replaced with a single `go install` call directly inside the `Dockerfile`, pulling the pinned upstream release from GitHub at build time — no local source copy required.
+
+**Why this change is being made**
+
+- **Smaller repository** — carrying the entire Gatus source tree (source files, tests, docs) inflated the repo size and git clone time with code that is never modified.
+- **Simpler version management** — upgrading Gatus now requires changing one version tag in the `Dockerfile` (`@v5.36.0` → `@v5.37.0`) rather than manually updating a submodule.
+- **Better separation of concerns** — configuration (`config.yaml`) is decoupled from the image build, which is the correct pattern for ECS where config is injected at runtime. Config changes no longer require a full image rebuild.
+- **Smaller binary** — the new build uses `-ldflags="-s -w"` to strip debug symbols, reducing the final binary size.
+- **Reproducible pinning** — the version tag in `go install` ensures the same binary is produced on every build, matching the reproducibility of the previous `go.sum`-locked approach without the overhead of vendoring the source.
+
+---
+
+### Running Locally (new approach)
+
+#### Not in Docker
+
+> **Note:** The steps above (using `git submodule update --init` and `cd gatus && make run`) reflect the previous sub-repo approach and are kept for reference. The new approach is documented below.
+
+**Prerequisites**
+
+- [Go](https://golang.org/dl/) 1.21 or higher (no submodule initialisation needed)
+
+**Install and run the application**
+
+```bash
+go install github.com/TwiN/gatus/v5@v5.36.0
+```
+
+Then run the installed binary, pointing it at your config file:
+
+```bash
+GATUS_CONFIG_PATH=gatus/config.yaml gatus
+```
+
+The application will be available at `http://localhost:8080`.
+
+**Verify the application is running**
+
+```bash
+curl http://localhost:8080/health
+```
+
+You should see:
+
+```json
+{"status":"UP"}
+```
+
+---
+
+#### In Docker
+
+> **Note:** The Docker build steps above (using `docker build -f docker/gatus/dockerfile -t gatus:local ./gatus`) reflect the previous sub-repo approach and are kept for reference. The new approach is documented below.
+
+**Build the image**
+
+Run this from the repo root:
+
+```bash
+docker build -t gatus:local .
+```
+
+**Run the application**
+
+Mount your config file at runtime so config changes do not require a rebuild:
+
+```bash
+docker run -d -p 8080:8080 \
+  -v $(pwd)/gatus/config.yaml:/config/config.yaml \
+  -e GATUS_CONFIG_PATH=/config/config.yaml \
+  --name gatus gatus:local
+```
+
+The application will be available at `http://localhost:8080`.
