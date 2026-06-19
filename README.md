@@ -31,7 +31,7 @@ cd gatus
 make run
 ```
 
-The application will be available at `http://localhost:8080`.
+The application will be available at `http://localhost:80`.
 
 On first run, Go will download the required dependencies automatically. This may take a minute.
 
@@ -40,7 +40,7 @@ On first run, Go will download the required dependencies automatically. This may
 Once the application is running, confirm it is healthy by running the following command in a separate terminal:
 
 ```bash
-curl http://localhost:8080/health
+curl http://localhost:80/health
 ```
 
 You should see the following response:
@@ -78,17 +78,17 @@ docker build -f docker/gatus/dockerfile -t gatus:local ./gatus
 **Run the application**
 
 ```bash
-docker run -d -p 8080:8080 --name gatus gatus:local
+docker run -d -p 80:8080 --name gatus gatus:local
 ```
 
-The application will be available at `http://localhost:8080`.
+The application will be available at `http://localhost:80`.
 
 **Verify the application is running**
 
 Once the container has started, confirm it is healthy by running the following command:
 
 ```bash
-curl http://localhost:8080/health
+curl http://localhost:80/health
 ```
 
 You should see the following response:
@@ -158,12 +158,12 @@ Then run the installed binary, pointing it at your config file:
 GATUS_CONFIG_PATH=gatus/config.yaml gatus
 ```
 
-The application will be available at `http://localhost:8080`.
+The application will be available at `http://localhost:80`.
 
 **Verify the application is running**
 
 ```bash
-curl http://localhost:8080/health
+curl http://localhost:80/health
 ```
 
 You should see:
@@ -191,10 +191,10 @@ docker build -t gatus:local .
 Mount your config file at runtime so config changes do not require a rebuild:
 
 ```bash
-docker run -d -p 8080:8080 \
+docker run -d -p 80:8080 \
   -v $(pwd)/gatus/config.yaml:/config/config.yaml \
   -e GATUS_CONFIG_PATH=/config/config.yaml \
   --name gatus gatus:local
 ```
 
-The application will be available at `http://localhost:8080`.
+The application will be available at `http://localhost:80`.
