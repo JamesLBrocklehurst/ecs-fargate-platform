@@ -1,53 +1,48 @@
 endpoints:
-  - name: front-end
-    group: core
-    url: "https://twin.sh/health"
+  - name: facebook
+    group: social-media
+    url: "https://www.facebook.com"
     interval: 5m
     conditions:
       - "[STATUS] == 200"
-      - "[BODY].status == UP"
-      - "[RESPONSE_TIME] < 150"
+      - "[RESPONSE_TIME] < 3000"
 
-  - name: back-end
-    group: core
-    url: "https://example.org/"
+  - name: linkedin
+    group: social-media
+    url: "https://www.linkedin.com"
     interval: 5m
     conditions:
       - "[STATUS] == 200"
-      - "[CERTIFICATE_EXPIRATION] > 48h"
+      - "[RESPONSE_TIME] < 3000"
 
-  - name: monitoring
-    group: internal
-    url: "https://example.org/"
+  - name: instagram
+    group: social-media
+    url: "https://www.instagram.com"
     interval: 5m
     conditions:
       - "[STATUS] == 200"
+      - "[RESPONSE_TIME] < 3000"
 
-  - name: nas
-    group: internal
-    url: "https://example.org/"
+  - name: youtube
+    group: social-media
+    url: "https://www.youtube.com"
     interval: 5m
     conditions:
       - "[STATUS] == 200"
+      - "[RESPONSE_TIME] < 3000"
 
-  - name: example-dns-query
-    url: "8.8.8.8" # Address of the DNS server to use
+  - name: tiktok
+    group: social-media
+    url: "https://www.tiktok.com"
     interval: 5m
-    dns:
-      query-name: "example.com"
-      query-type: "A"
     conditions:
-      - "[BODY] == pat(*.*.*.*)"  # Matches any IPv4 address
-      - "[DNS_RCODE] == NOERROR"
+      - "[STATUS] == 200"
+      - "[RESPONSE_TIME] < 3000"
 
-  - name: icmp-ping
-    url: "icmp://example.org"
-    interval: 1m
+  - name: x
+    group: social-media
+    url: "https://www.x.com"
+    interval: 5m
     conditions:
-      - "[CONNECTED] == true"
-
-  - name: check-domain-expiration
-    url: "https://example.org/"
-    interval: 1h
-    conditions:
-      - "[DOMAIN_EXPIRATION] > 720h"
+      - "[STATUS] == 200"
+      - "[RESPONSE_TIME] < 3000"
