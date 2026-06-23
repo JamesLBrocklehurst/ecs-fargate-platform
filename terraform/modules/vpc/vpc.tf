@@ -17,6 +17,7 @@ resource "aws_subnet" "public" {
   vpc_id            = aws_vpc.main.id
   cidr_block        = each.value.cidr_block
   availability_zone = each.value.availability_zone
+  map_public_ip_on_launch = true
 
   tags = {
     Name        = each.key
@@ -65,7 +66,7 @@ resource "aws_eip" "nat" {
 
 resource "aws_nat_gateway" "main" {
   allocation_id = aws_eip.nat.id
-  subnet_id     = aws_subnet.public[keys(var.public_subnets)[0]].id
+  subnet_id     = aws_subnet.public[var.nat_gateway_subnet].id
 
   tags = {
     Name        = "main-nat"

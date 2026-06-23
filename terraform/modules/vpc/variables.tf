@@ -18,3 +18,8 @@ variable "private_subnets" {
     availability_zone = string
   }))
 }
+
+variable "nat_gateway_subnet" {
+  description = "Key of the public subnet to place the NAT Gateway in"
+  type        = string
+}
