@@ -1,0 +1,23 @@
+public_subnets = {
+  "public-1" = {
+    cidr_block        = "x.x.x.x/xx"
+    availability_zone = "your-az-here"
+  }
+  "public-2" = {
+    cidr_block        = "x.x.x.x/xx"
+    availability_zone = "your-az-here"
+  }
+}
+
+private_subnets = {
+  "private-1" = {
+    cidr_block        = "x.x.x.x/xx"
+    availability_zone = "your-az-here"
+  }
+  "private-2" = {
+    cidr_block        = "x.x.x.x/xx"
+    availability_zone = "your-az-here"
+  }
+}
+
+nat_gateway_subnet = "your-subnet-here"
