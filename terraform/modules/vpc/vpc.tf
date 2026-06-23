@@ -4,6 +4,7 @@ resource "aws_vpc" "main" {
   cidr_block = var.vpc_cidr
 
   tags = {
+    Name        = "${var.app_name}-main-vpc"
     Terraform   = "true"
     Environment = "production"
   }
@@ -20,7 +21,7 @@ resource "aws_subnet" "public" {
   map_public_ip_on_launch = true
 
   tags = {
-    Name        = each.key
+    Name        = "${var.app_name}-${each.key}"
     Terraform   = "true"
     Environment = "production"
   }
@@ -34,7 +35,7 @@ resource "aws_subnet" "private" {
   availability_zone = each.value.availability_zone
 
   tags = {
-    Name        = each.key
+    Name        = "${var.app_name}-${each.key}"
     Terraform   = "true"
     Environment = "production"
   }
@@ -46,7 +47,7 @@ resource "aws_internet_gateway" "main" {
   vpc_id = aws_vpc.main.id
 
   tags = {
-    Name        = "main-igw"
+    Name        = "${var.app_name}-main-igw"
     Terraform   = "true"
     Environment = "production"
   }
@@ -58,7 +59,7 @@ resource "aws_eip" "nat" {
   domain = "vpc"
 
   tags = {
-    Name        = "nat-eip"
+    Name        = "${var.app_name}-nat-eip"
     Terraform   = "true"
     Environment = "production"
   }
@@ -69,7 +70,7 @@ resource "aws_nat_gateway" "main" {
   subnet_id     = aws_subnet.public[var.nat_gateway_subnet].id
 
   tags = {
-    Name        = "main-nat"
+    Name        = "${var.app_name}-nat"
     Terraform   = "true"
     Environment = "production"
   }
@@ -90,7 +91,7 @@ resource "aws_route_table" "public" {
   }
 
   tags = {
-    Name        = "public-rt"
+    Name        = "${var.app_name}-public-rt"
     Terraform   = "true"
     Environment = "production"
   }
@@ -105,7 +106,7 @@ resource "aws_route_table" "private" {
   }
 
   tags = {
-    Name        = "private-rt"
+    Name        = "${var.app_name}-private-rt"
     Terraform   = "true"
     Environment = "production"
   }

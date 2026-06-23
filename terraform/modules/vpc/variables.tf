@@ -23,3 +23,8 @@ variable "nat_gateway_subnet" {
   description = "Key of the public subnet to place the NAT Gateway in"
   type        = string
 }
+
+variable "app_name" {
+  description = "Name of the application"
+  type        = string
+}
