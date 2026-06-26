@@ -21,3 +21,5 @@ private_subnets = {
 }
 
 nat_gateway_subnet = "your-subnet-here"
+app_name = "name of your application"
+encryption_type = "level of encryption you wish to set"
