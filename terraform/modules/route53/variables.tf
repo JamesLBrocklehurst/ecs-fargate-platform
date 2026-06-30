@@ -17,3 +17,19 @@ variable "certificate_arn" {
   description = "The ARN of the ACM certificate to validate"
   type        = string
 }
+
+variable "record_name" {
+  description = "The name of the record to create for the ALB alias (e.g. the subdomain or root domain). Defaults to the root domain."
+  type        = string
+  default     = ""
+}
+
+variable "alb_dns_name" {
+  description = "The DNS name of the ALB, used as the alias target"
+  type        = string
+}
+
+variable "alb_zone_id" {
+  description = "The hosted zone ID of the ALB, used as the alias target"
+  type        = string
+}

@@ -25,3 +25,17 @@ resource "aws_acm_certificate_validation" "main" {
   certificate_arn         = var.certificate_arn
   validation_record_fqdns = [for record in aws_route53_record.acm_validation : record.fqdn]
 }
+
+# Alias A Record to the ALB
+
+resource "aws_route53_record" "alb_alias" {
+  zone_id = data.aws_route53_zone.main.zone_id
+  name    = var.record_name != "" ? var.record_name : var.domain_name
+  type    = "A"
+
+  alias {
+    name                   = var.alb_dns_name
+    zone_id                = var.alb_zone_id
+    evaluate_target_health = true
+  }
+}
