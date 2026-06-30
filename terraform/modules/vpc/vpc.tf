@@ -112,9 +112,7 @@ resource "aws_route_table" "private" {
   }
 }
 
-# -------------------------------------------------------
-# ROUTE TABLE ASSOCIATIONS
-# -------------------------------------------------------
+# Route Table Associations
 
 resource "aws_route_table_association" "public" {
   for_each = var.public_subnets
