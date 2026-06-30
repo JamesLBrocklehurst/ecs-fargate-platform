@@ -37,3 +37,18 @@ variable "alb_security_group_id" {
   description = "The ID of the ALB security group, allowed to send traffic to the ECS tasks"
   type        = string
 }
+
+variable "desired_count" {
+  description = "The number of ECS task instances to run"
+  type        = number
+}
+
+variable "private_subnet_ids" {
+  description = "List of private subnet IDs to place the ECS tasks in"
+  type        = list(string)
+}
+
+variable "target_group_arn" {
+  description = "The ARN of the ALB target group to register ECS tasks with"
+  type        = string
+}
