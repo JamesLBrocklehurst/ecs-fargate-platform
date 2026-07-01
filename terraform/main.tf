@@ -33,7 +33,7 @@ module "route53" {
   domain_name = var.domain_name
   alb_dns_name = module.alb.alb_dns_name
   alb_zone_id = module.alb.alb_zone_id
-  acm_validation_options = module.acm.acm_validation_options
+  acm_validation_options = module.acm.domain_validation_options
   certificate_arn = module.acm.certificate_arn
 }
 
@@ -64,4 +64,5 @@ module "ecs" {
   aws_region = var.aws_region
   alb_security_group_id = module.alb.alb_security_group_id
   desired_count = var.desired_count
+  depends_on = [module.alb]
 }
