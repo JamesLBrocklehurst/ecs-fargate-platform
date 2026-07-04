@@ -43,7 +43,7 @@ module "alb" {
   source = "./modules/alb"
   app_name = var.app_name
   vpc_id = module.vpc.vpc_id
-  certificate_arn = module.acm.certificate_arn
+  certificate_arn = module.route53.validated_certificate_arn
   public_subnet_ids = module.vpc.public_subnet_ids
   target_port = var.target_port
   health_check_path = var.health_check_path
@@ -66,3 +66,4 @@ module "ecs" {
   desired_count = var.desired_count
   depends_on = [module.alb]
 }
+
