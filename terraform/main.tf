@@ -35,6 +35,7 @@ module "route53" {
   alb_zone_id = module.alb.alb_zone_id
   acm_validation_options = module.acm.domain_validation_options
   certificate_arn = module.acm.certificate_arn
+  record_name = "${var.subdomain}.${var.domain_name}"
 }
 
 # ALB module
