@@ -1,9 +1,11 @@
 variable "app_name" {
-  type = string
+  description = "Name of the application, used as a prefix/tag for created resources"
+  type        = string
 }
 
 variable "encryption_type" {
-  type = string
+  description = "The encryption type for the ECR repository"
+  type        = string
 }
 
 variable "vpc_cidr" {
@@ -43,37 +45,6 @@ variable "subdomain" {
   default     = ""
 }
 
-variable "acm_validation_options" {
-  description = "The domain_validation_options output from the ACM module, used to create DNS validation records"
-  type = set(object({
-    domain_name           = string
-    resource_record_name  = string
-    resource_record_type  = string
-    resource_record_value = string
-  }))
-}
-
-variable "certificate_arn" {
-  description = "The ARN of the ACM certificate to validate"
-  type        = string
-}
-
-variable "record_name" {
-  description = "The name of the record to create for the ALB alias (e.g. the subdomain or root domain). Defaults to the root domain."
-  type        = string
-  default     = ""
-}
-
-variable "alb_dns_name" {
-  description = "The DNS name of the ALB, used as the alias target"
-  type        = string
-}
-
-variable "alb_zone_id" {
-  description = "The hosted zone ID of the ALB, used as the alias target"
-  type        = string
-}
-
 variable "target_port" {
   description = "The port the target group forwards traffic to on the ECS tasks"
   type        = number
@@ -107,31 +78,11 @@ variable "container_port" {
 }
 
 variable "aws_region" {
-  description = "The AWS region the ECS service is deployed in, used for the awslogs log driver"
-  type        = string
-}
-
-variable "vpc_id" {
-  description = "The ID of the VPC the ECS tasks will be deployed into"
-  type        = string
-}
-
-variable "alb_security_group_id" {
-  description = "The ID of the ALB security group, allowed to send traffic to the ECS tasks"
+  description = "The AWS region resources are deployed in"
   type        = string
 }
 
 variable "desired_count" {
   description = "The number of ECS task instances to run"
   type        = number
-}
-
-variable "private_subnet_ids" {
-  description = "List of private subnet IDs to place the ECS tasks in"
-  type        = list(string)
-}
-
-variable "target_group_arn" {
-  description = "The ARN of the ALB target group to register ECS tasks with"
-  type        = string
 }
