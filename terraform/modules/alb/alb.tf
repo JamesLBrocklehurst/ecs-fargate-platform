@@ -71,6 +71,10 @@ resource "aws_lb_target_group" "main" {
     timeout             = 5
   }
 
+  lifecycle {
+    create_before_destroy = true
+  }
+
   tags = {
     Name        = "${var.app_name}-tg"
     Terraform   = "true"
