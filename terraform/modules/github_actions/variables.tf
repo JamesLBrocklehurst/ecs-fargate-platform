@@ -12,3 +12,13 @@ variable "github_repo" {
   description = "GitHub repository name"
   type        = string
 }
+
+variable "state_bucket" {
+  description = "Name of the S3 bucket used for Terraform state"
+  type        = string
+}
+
+variable "dynamodb_table" {
+  description = "Name of the DynamoDB table used for Terraform state locking"
+  type        = string
+}

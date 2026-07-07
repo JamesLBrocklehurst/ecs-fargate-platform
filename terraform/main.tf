@@ -1,3 +1,15 @@
+# Github Actions module
+
+module "github_actions" {
+  source = "./modules/github_actions"
+
+  app_name       = var.app_name
+  github_username = var.github_username
+  github_repo    = var.github_repo
+  state_bucket   = "gatus-terraform-state-701632806466"
+  dynamodb_table = "gatus-terraform-locks"
+}
+
 # ECR module
 
 module "ecr" {

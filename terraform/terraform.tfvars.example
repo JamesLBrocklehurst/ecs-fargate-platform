@@ -35,3 +35,6 @@ container_image = ""
 target_port     = ""
 health_check_path = "/"
 desired_count = ""
+
+github_username = "GithubUsername"
+github_repo = "examplereponame"

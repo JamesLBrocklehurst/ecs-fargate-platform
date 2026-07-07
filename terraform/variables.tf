@@ -86,3 +86,13 @@ variable "desired_count" {
   description = "The number of ECS task instances to run"
   type        = number
 }
+
+variable "github_username" {
+  description = "GitHub username for the repository"
+  type        = string
+}
+
+variable "github_repo" {
+  description = "GitHub repository name"
+  type        = string
+}
