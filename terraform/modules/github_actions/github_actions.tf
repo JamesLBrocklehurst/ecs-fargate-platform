@@ -1,8 +1,12 @@
+# Creating AWS IAM OIDC Provider for GitHub Actions
+
 resource "aws_iam_openid_connect_provider" "github_gatus" {
   url             = "https://token.actions.githubusercontent.com"
   client_id_list  = ["sts.amazonaws.com"]
   thumbprint_list = ["6938fd4d98bab03faadb97b34396831e3780aea1"]
 }
+
+# Creating AWS IAM Role
 
 resource "aws_iam_role" "github_actions" {
   name = "${var.app_name}-github-actions-role"
@@ -31,6 +35,8 @@ resource "aws_iam_role" "github_actions" {
     Environment = "production"
   }
 }
+
+# Attaching AWS Managed Policies to the IAM Role
 
 resource "aws_iam_role_policy_attachment" "github_actions_ecr" {
   role       = aws_iam_role.github_actions.name
@@ -87,6 +93,8 @@ resource "aws_iam_policy" "github_actions_terraform" {
     ]
   })
 }
+
+# Attaching the custom policy to the IAM Role
 
 resource "aws_iam_role_policy_attachment" "github_actions_terraform" {
   role       = aws_iam_role.github_actions.name
