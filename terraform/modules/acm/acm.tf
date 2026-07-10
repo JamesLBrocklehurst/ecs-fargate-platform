@@ -12,6 +12,8 @@ resource "aws_acm_certificate" "main" {
     create_before_destroy = true
   }
 
+# Tags
+
   tags = {
     Name        = "${var.app_name}-acm-cert"
     Terraform   = "true"
