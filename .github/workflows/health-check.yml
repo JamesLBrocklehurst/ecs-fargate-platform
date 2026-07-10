@@ -1,0 +1,24 @@
+name: Health-Check
+
+on:
+  workflow_run:
+    workflows: ["Build and Push Docker Image"]
+    branches:
+      - main
+    types:
+      - completed
+  workflow_dispatch:
+
+jobs:
+  health-check:
+    name: Post-Deploy Health Check
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
+
+    steps:
+      - name: Wait for ECS to stabilise
+        run: sleep 120
+
+      - name: Check Gatus health endpoint
+        run: |
+          curl --fail https://gatus.jamesbrocklehurst.co.uk/health
