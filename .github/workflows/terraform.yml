@@ -31,25 +31,63 @@ jobs:
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: "1.9.0"
-      
+
       - name: Terraform Init
         run: terraform -chdir=terraform init
 
       - name: Terraform Validate
         run: terraform -chdir=terraform validate
 
-      - name: Install TFlint
+      - name: Install TFLint
         run: |
           curl -s https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash
 
-      - name: TFlint
+      - name: TFLint
         run: |
           cd terraform
           tflint --init
-          tflint
+          tflint --format compact
 
       - name: Terraform Plan
+        env:
+          TF_VAR_app_name: ${{ vars.TF_VAR_APP_NAME }}
+          TF_VAR_aws_region: ${{ vars.TF_VAR_AWS_REGION }}
+          TF_VAR_container_port: ${{ vars.TF_VAR_CONTAINER_PORT }}
+          TF_VAR_target_port: ${{ vars.TF_VAR_TARGET_PORT }}
+          TF_VAR_health_check_path: ${{ vars.TF_VAR_HEALTH_CHECK_PATH }}
+          TF_VAR_desired_count: ${{ vars.TF_VAR_DESIRED_COUNT }}
+          TF_VAR_task_cpu: ${{ vars.TF_VAR_TASK_CPU }}
+          TF_VAR_task_memory: ${{ vars.TF_VAR_TASK_MEMORY }}
+          TF_VAR_encryption_type: ${{ vars.TF_VAR_ENCRYPTION_TYPE }}
+          TF_VAR_nat_gateway_subnet: ${{ vars.TF_VAR_NAT_GATEWAY_SUBNET }}
+          TF_VAR_subdomain: ${{ vars.TF_VAR_SUBDOMAIN }}
+          TF_VAR_github_username: ${{ vars.TF_VAR_GITHUB_USERNAME }}
+          TF_VAR_github_repo: ${{ vars.TF_VAR_GITHUB_REPO }}
+          TF_VAR_vpc_cidr: ${{ vars.TF_VAR_VPC_CIDR }}
+          TF_VAR_public_subnets: ${{ vars.TF_VAR_PUBLIC_SUBNETS }}
+          TF_VAR_private_subnets: ${{ vars.TF_VAR_PRIVATE_SUBNETS }}
+          TF_VAR_domain_name: ${{ secrets.TF_VAR_DOMAIN_NAME }}
+          TF_VAR_container_image: ${{ secrets.TF_VAR_CONTAINER_IMAGE }}
         run: terraform -chdir=terraform plan
 
       - name: Terraform Apply
+        env:
+          TF_VAR_app_name: ${{ vars.TF_VAR_APP_NAME }}
+          TF_VAR_aws_region: ${{ vars.TF_VAR_AWS_REGION }}
+          TF_VAR_container_port: ${{ vars.TF_VAR_CONTAINER_PORT }}
+          TF_VAR_target_port: ${{ vars.TF_VAR_TARGET_PORT }}
+          TF_VAR_health_check_path: ${{ vars.TF_VAR_HEALTH_CHECK_PATH }}
+          TF_VAR_desired_count: ${{ vars.TF_VAR_DESIRED_COUNT }}
+          TF_VAR_task_cpu: ${{ vars.TF_VAR_TASK_CPU }}
+          TF_VAR_task_memory: ${{ vars.TF_VAR_TASK_MEMORY }}
+          TF_VAR_encryption_type: ${{ vars.TF_VAR_ENCRYPTION_TYPE }}
+          TF_VAR_nat_gateway_subnet: ${{ vars.TF_VAR_NAT_GATEWAY_SUBNET }}
+          TF_VAR_subdomain: ${{ vars.TF_VAR_SUBDOMAIN }}
+          TF_VAR_github_username: ${{ vars.TF_VAR_GITHUB_USERNAME }}
+          TF_VAR_github_repo: ${{ vars.TF_VAR_GITHUB_REPO }}
+          TF_VAR_vpc_cidr: ${{ vars.TF_VAR_VPC_CIDR }}
+          TF_VAR_public_subnets: ${{ vars.TF_VAR_PUBLIC_SUBNETS }}
+          TF_VAR_private_subnets: ${{ vars.TF_VAR_PRIVATE_SUBNETS }}
+          TF_VAR_domain_name: ${{ secrets.TF_VAR_DOMAIN_NAME }}
+          TF_VAR_container_image: ${{ secrets.TF_VAR_CONTAINER_IMAGE }}
         run: terraform -chdir=terraform apply --auto-approve
