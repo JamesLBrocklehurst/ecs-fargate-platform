@@ -38,7 +38,8 @@ jobs:
           docker build --platform linux/amd64 \
             -t ${{ secrets.ECR_REPOSITORY }}:${{ github.sha }} \
             -t ${{ secrets.ECR_REPOSITORY }}:latest \
-            .
+            -f docker/gatus/Dockerfile \
+            docker/gatus
 
       - name: Push Docker image to ECR
         run: |
