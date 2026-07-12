@@ -29,7 +29,7 @@ The project is intended as a small, complete example of a production style deplo
 
 ## Architecture
 
-![Gatus ECS Platform Architecture](images/architecture.jpg)
+![Gatus ECS Platform Architecture](images/architecture.jpeg)
 
 The diagram covers the VPC, public/private subnets across two AZs, the ALB and target group, the ECS Fargate service, ECR, ACM/Route 53, CloudWatch Logs, and the GitHub Actions OIDC deploy path.
 
