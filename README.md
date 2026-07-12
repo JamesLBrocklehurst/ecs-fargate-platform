@@ -19,9 +19,9 @@ Gatus Monitoring Platform on AWS
 
 ## Architecture
 
-> Architecture diagram coming soon — currently being put together. This section is reserved for it.
+![Gatus ECS Platform Architecture](images/architecture.jpg)
 
-<!-- ![Architecture diagram](images/architecture.png) -->
+The diagram covers the VPC, public/private subnets across two AZs, the ALB and target group, the ECS Fargate service, ECR, ACM/Route 53, CloudWatch Logs, and the GitHub Actions OIDC deploy path.
 
 ## Tech Stack
 
