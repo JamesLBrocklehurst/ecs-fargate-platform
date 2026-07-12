@@ -4,21 +4,30 @@ Gatus Monitoring Platform on AWS
 
 ## Table of Contents
 
-1. [Architecture](#architecture)
-2. [Live URL](#live-url)
-3. [Tech Stack](#tech-stack)
-4. [Running Locally](#running-locally)
+1. [Project Overview](#project-overview)
+2. [Architecture](#architecture)
+3. [Live URL](#live-url)
+4. [Tech Stack](#tech-stack)
+5. [Running Locally](#running-locally)
    - [Not in Docker](#not-in-docker)
    - [In Docker](#in-docker)
-5. [Pipeline Evidence](#pipeline-evidence)
+6. [Pipeline Evidence](#pipeline-evidence)
    - [Terraform Deploy](#terraform-deploy)
    - [Docker Image Push to ECR](#docker-image-push-to-ecr)
    - [Health Check](#health-check)
-6. [AWS Checks](#aws-checks)
-7. [Changes](#changes)
+7. [AWS Checks](#aws-checks)
+8. [Changes](#changes)
    - [Removing the Gatus sub-repo in favour of `go install`](#removing-the-gatus-sub-repo-in-favour-of-go-install)
    - [Running Locally (new approach)](#running-locally-new-approach)
-8. [Future Plans](#future-plans)
+9. [Future Plans](#future-plans)
+
+## Project Overview
+
+This project runs [Gatus](https://github.com/TwiN/gatus), a health check and uptime monitoring tool, on AWS ECS Fargate. The infrastructure is provisioned with Terraform, and container images are built, scanned, and deployed through GitHub Actions using OIDC federated roles rather than static AWS credentials.
+
+The application sits behind a public Application Load Balancer in a custom VPC, spanning two Availability Zones in `eu-west-2`. The ECS tasks run in private subnets with no public IP, reachable only from the ALB. Traffic to the ALB is served over HTTPS using an ACM certificate, with the hostname `gatus.jamesbrocklehurst.co.uk` managed through Route 53. Container images are stored in a dedicated ECR repository with image scanning enabled, and application logs are shipped to CloudWatch.
+
+The project is intended as a small, complete example of a production style deployment path: infrastructure as code, a private container platform, TLS terminated load balancing, and an automated build and deploy pipeline, built end to end on AWS.
 
 ## Architecture
 
