@@ -5,23 +5,36 @@ Gatus Monitoring Platform on AWS
 ## Table of Contents
 
 1. [Architecture](#architecture)
-2. [Tech Stack](#tech-stack)
-3. [Running Locally](#running-locally)
+2. [Live URL](#live-url)
+3. [Tech Stack](#tech-stack)
+4. [Running Locally](#running-locally)
    - [Not in Docker](#not-in-docker)
    - [In Docker](#in-docker)
-4. [Pipeline Evidence](#pipeline-evidence)
+5. [Pipeline Evidence](#pipeline-evidence)
    - [Terraform Deploy](#terraform-deploy)
    - [Docker Image Push to ECR](#docker-image-push-to-ecr)
    - [Health Check](#health-check)
-5. [Changes](#changes)
+6. [AWS Checks](#aws-checks)
+7. [Changes](#changes)
    - [Removing the Gatus sub-repo in favour of `go install`](#removing-the-gatus-sub-repo-in-favour-of-go-install)
    - [Running Locally (new approach)](#running-locally-new-approach)
+8. [Future Plans](#future-plans)
 
 ## Architecture
 
 ![Gatus ECS Platform Architecture](images/architecture.jpg)
 
 The diagram covers the VPC, public/private subnets across two AZs, the ALB and target group, the ECS Fargate service, ECR, ACM/Route 53, CloudWatch Logs, and the GitHub Actions OIDC deploy path.
+
+## Live URL
+
+When the app infrastructure is deployed, the Gatus dashboard is available at:
+
+```text
+https://gatus.jamesbrocklehurst.co.uk
+```
+
+![Gatus dashboard running live](images/gatus-running.png)
 
 ## Tech Stack
 
@@ -173,6 +186,22 @@ docker start gatus
 
 ---
 
+## AWS Checks
+
+After the pipelines pass, the deployed AWS resources are also checked directly from the AWS side:
+
+- ECS service `gatus-service` is active in cluster `gatus-cluster`, with the desired task count matching the running task count.
+- Target group `gatus-tg` has a healthy target on port `8080` for the running ECS task, using health check path `/health`.
+- ALB listener `HTTP:80` redirects to `HTTPS:443`.
+- ALB listener `HTTPS:443` forwards traffic to target group `gatus-tg`.
+- The ALB security group allows public `80`/`443` traffic in, and only forwards `8080` traffic on to ECS.
+- The ECS task security group only allows inbound `8080` from the ALB security group.
+- The HTTPS endpoint `https://gatus.jamesbrocklehurst.co.uk` returns `200`.
+
+![ALB target group healthy](images/target-group.png)
+
+---
+
 ## Changes
 
 ### Removing the Gatus sub-repo in favour of `go install`
@@ -253,3 +282,14 @@ docker run -d -p 80:8080 \
 ```
 
 The application will be available at `http://localhost:80`.
+
+---
+
+## Future Plans
+
+- Adding more meaningful internal and external Gatus checks.
+- Adding ECS autoscaling policies.
+- Considering VPC endpoints to reduce NAT dependency.
+- Adding public access protection and deeper network logging as a later hardening phase.
+- Splitting environments beyond the current dev setup.
+- Documenting the operational runbook for releases and rollbacks.
