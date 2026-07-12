@@ -1,5 +1,44 @@
-# ecs-fargate-platform
+# ecs-fargate-platform - Gatus Monitoring System
+
 Gatus Monitoring Platform on AWS
+
+## Table of Contents
+
+1. [Architecture](#architecture)
+2. [Tech Stack](#tech-stack)
+3. [Running Locally](#running-locally)
+   - [Not in Docker](#not-in-docker)
+   - [In Docker](#in-docker)
+4. [Pipeline Evidence](#pipeline-evidence)
+   - [Terraform Deploy](#terraform-deploy)
+   - [Docker Image Push to ECR](#docker-image-push-to-ecr)
+   - [Health Check](#health-check)
+5. [Changes](#changes)
+   - [Removing the Gatus sub-repo in favour of `go install`](#removing-the-gatus-sub-repo-in-favour-of-go-install)
+   - [Running Locally (new approach)](#running-locally-new-approach)
+
+## Architecture
+
+> Architecture diagram coming soon — currently being put together. This section is reserved for it.
+
+<!-- ![Architecture diagram](images/architecture.png) -->
+
+## Tech Stack
+
+- **AWS ECS Fargate** — runs the Gatus container
+- **AWS ECR** — stores the built container image
+- **AWS ALB** — public load balancer in front of ECS
+- **AWS ACM** — TLS certificates for the ALB
+- **AWS Route 53** — DNS for the application hostname
+- **AWS VPC** — networking (public/private subnets)
+- **AWS IAM OIDC** — federated auth for GitHub Actions, no long-lived AWS keys
+- **Terraform** — infrastructure as code, modular by service (ACM, ALB, ECR, ECS, GitHub Actions, Route 53, VPC)
+- **S3 + DynamoDB** — remote Terraform state storage and state locking
+- **Docker** — multi-stage build, `golang:alpine` builder → `distroless/static:nonroot` runtime
+- **Go** — Gatus is built and installed via `go install`
+- **Gatus** — the monitoring/health-check application being deployed
+- **GitHub Actions** — CI/CD pipelines for Terraform and Docker
+- **TFLint** — Terraform linting in CI
 
 ## Running Locally
 
@@ -115,6 +154,22 @@ To start it again without rebuilding:
 ```bash
 docker start gatus
 ```
+
+---
+
+## Pipeline Evidence
+
+### Terraform Deploy
+
+![Terraform deploy pipeline passing](images/Terraform-deploy.png)
+
+### Docker Image Push to ECR
+
+![Docker image push to ECR pipeline passing](images/DockerImage-push-to-ecr.png)
+
+### Health Check
+
+![Health check pipeline passing](images/Health-check.png)
 
 ---
 
