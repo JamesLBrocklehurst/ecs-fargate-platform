@@ -1,16 +1,16 @@
 # ECR Repository
 
 resource "aws_ecr_repository" "main" {
-  name = "${var.app_name}-ecr-repo"
+  name                 = "${var.app_name}-ecr-repo"
   image_tag_mutability = "IMMUTABLE"
-  force_delete = true
+  force_delete         = true
   image_scanning_configuration {
     scan_on_push = true
   }
 
   encryption_configuration {
-    encryption_type = "${var.encryption_type}"
-  
+    encryption_type = var.encryption_type
+
   }
 
   tags = {

@@ -7,9 +7,9 @@ terraform {
     }
   }
   backend "s3" {
-    bucket = "gatus-terraform-state-701632806466"
-    key    = "gatus/terraform.tfstate"
-    region = "eu-west-2"
+    bucket         = "gatus-terraform-state-701632806466"
+    key            = "gatus/terraform.tfstate"
+    region         = "eu-west-2"
     dynamodb_table = "gatus-terraform-locks"
   }
 }
